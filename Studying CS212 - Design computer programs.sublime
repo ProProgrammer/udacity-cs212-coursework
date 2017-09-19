@@ -1,0 +1,41 @@
+Poker rules:
+	Concept: Hand
+		A hand consists of 5 cards
+	
+	Concept: Card
+		Card has a Rank and a Suit
+			Eg: 5 of Diamonds has Rank: 5 and Suit: Diamond
+
+poker(hands) --> hand
+	This function takes in a list of hands as input and returns the best hand
+
+Best hand definition - Visit rules of Poker, basic understanding is as follows:
+	Eg: - 	2 Js - Heart and Spades
+			2 2s - Diamond and Club
+			1 5 -  Diamond
+		- Now this hand has two pairs with a 5, rules specify which type of hand is higher than the which other type. This is called hand rank
+	
+	Concept: Hand Rank
+		Rank of a hand based on the card rank and card suit present in that hand
+		Hand rank are based on:
+			n - kind (Cards of the same kind/rank - in above example we have Two of a kind in two 2s and two Jacks)
+			Straight
+			Flush
+
+	Eg: -	5 - Club
+			6 - Spade
+			7 - Diamond
+			8 - Spade
+			9 - Heart
+		- This is a straight hand since it has 5 cards in same sequence. Suits don't matter
+
+	Eg  -	10 - Diamond
+			7 - Diamond
+			5 - Diamond
+			4 - Diamond
+			2 - Diamond
+		- This hand is a FLUSH because all 5 cards have the same suit, and the rank of the cards don't matter.
+
+
+Incorrect. Make sure that poker returns the max of hands according to the appropriate key.
+https://www.udacity.com/view#Course/cs212/CourseRev/apr2012/Unit/71001/Nugget/56009
