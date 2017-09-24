@@ -118,12 +118,7 @@ def best_hand_from_list_of_hands(list_of_hands):
     It then returns the max of all the cards from that output list
 
     """
-    five_card_best_hands = list()
-
-    for hand in list_of_hands:
-        hand_as_list = hand.split()
-        best_hand = max(itertools.combinations(hand_as_list, 5), key=hand_rank)
-        five_card_best_hands.append(best_hand)
+    five_card_best_hands = [max(itertools.combinations(hand.split(), 5), key=hand_rank) for hand in list_of_hands]
 
     return max(five_card_best_hands, key=hand_rank)
 
