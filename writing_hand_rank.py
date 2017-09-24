@@ -1,32 +1,19 @@
-# -----------
-# User Instructions
-# 
-# Modify the hand_rank function so that it returns the
-# correct output for the remaining hand types, which are:
-# full house, flush, straight, three of a kind, two pair,
-# pair, and high card hands. 
-# 
-# Do this by completing each return statement below.
-#
 # You may assume the following behavior of each function:
 #
 # straight(ranks): returns True if the hand is a straight.
 # flush(hand):     returns True if the hand is a flush.
 # kind(n, ranks):  returns the first rank that the hand has
-#                  exactly n of. For A hand with 4 sevens 
+#                  exactly n of. For A hand with 4 sevens
 #                  this function would return 7.
-# two_pair(ranks): if there is a two pair, this function 
-#                  returns their corresponding ranks as a 
+# two_pair(ranks): if there is a two pair, this function
+#                  returns their corresponding ranks as a
 #                  tuple. For example, a hand with 2 twos
 #                  and 2 fours would cause this function
 #                  to return (4, 2).
 # card_ranks(hand) returns an ORDERED tuple of the ranks
 #                  in a hand (where the order goes from
-#                  highest to lowest rank). 
+#                  highest to lowest rank).
 #
-# Since we are assuming that some functions are already
-# written, this code will not RUN. Clicking SUBMIT will 
-# tell you if you are correct.
 # # # # # Poker Rules # # # # # #
 # 0 Nothing - High Card
 # 1 Pair
@@ -37,8 +24,141 @@
 # 6 Full House
 # 7 Four of a Kind
 # 8 Straight Flush
+# -------------------------------------------------
+# Instructions for CS 212, hw1-2: Jokers Wild
+#
+# -----------------
+# User Instructions
+#
+# Write a function best_wild_hand(hand) that takes as
+# input a 7-card hand and returns the best 5 card hand.
+# In this problem, it is possible for a hand to include
+# jokers. Jokers will be treated as 'wild cards' which
+# can take any rank or suit of the same color. The
+# black joker, '?B', can be used as any spade or club
+# and the red joker, '?R', can be used as any heart
+# or diamond.
+#
+# The itertools library may be helpful. Feel free to
+# define multiple functions if it helps you solve the
+# problem.
+#
+# -----------------
+# Grading Notes
+#
+# Multiple correct answers will be accepted in cases
+# where the best hand is ambiguous (for example, if
+# you have 4 kings and 3 queens, there are three best
+# hands: 4 kings along with any of the three queens).
+# -------------------------------------------------
 
 import itertools
+
+
+def hands_without_joker(hand):
+    """
+
+    Args:
+        hand: a list of cards such as ['6C', '7C', '8C', '9C', 'TC', '?R', '?B']
+
+    Returns: This function takes in a hand and if the hand has a wild card in the format ?B or ?R, it replaces the
+    wild cards with all possible values (Any S or C for ?B and any H or D for ?R) and returns the list of
+    hands with replaced wild cards
+
+    """
+
+    print "input hand:", hand
+
+    hand_list_without_black_wildcard = []
+    hand_list_without_red_wildcard = []
+
+    rank = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+    # rank = ["2", "3"]
+
+    b_wildcard_replacement_suit = ["C", "S"]
+    # b_wildcard_replacement_suit = ["C"]
+    r_wildcard_replacement_suit = ["D", "H"]
+    # r_wildcard_replacement_suit = ["D"]
+
+    replacement_cards_for_b_wildcard = ["".join(item) for item in itertools.product(rank, b_wildcard_replacement_suit)]
+    replacement_cards_for_r_wildcard = ["".join(item) for item in itertools.product(rank, r_wildcard_replacement_suit)]
+
+    black_wildcard = "?B"
+    red_wildcard = "?R"
+
+    if black_wildcard in hand:
+        for card in hand:
+            if card == black_wildcard:
+                for x in replacement_cards_for_b_wildcard:
+                    hand_without_wildcard = " ".join(hand).replace(black_wildcard, x)
+                    hand_list_without_black_wildcard.append(hand_without_wildcard)
+    else:
+        hand_list_without_black_wildcard.append(" ".join(hand))
+
+    # print "hand_list_without_black_wildcard:", hand_list_without_black_wildcard
+    for hand in hand_list_without_black_wildcard:
+        if red_wildcard in hand:
+            hand_as_list = hand.split()
+            # print "hand_as_list:", hand_as_list
+            for card in hand_as_list:
+                if card == red_wildcard:
+                    # print card
+                    for replacement_card in replacement_cards_for_r_wildcard:
+                        hand_without_wildcard = " ".join(hand_as_list).replace(red_wildcard, replacement_card)
+                        hand_list_without_red_wildcard.append(hand_without_wildcard)
+        else:
+            hand_list_without_red_wildcard.append(hand)
+
+    print "hand_list_without_red_wildcard:", hand_list_without_red_wildcard
+
+    if hand_list_without_black_wildcard:
+        return hand_list_without_black_wildcard
+    else:
+        return [" ".join(hand)]
+
+
+def best_hand_from_list_of_hands(list_of_hands):
+    """
+
+    Args:
+        list_of_hands: List of hands, each hand is a string. Eg: "6C 7C 8C 9C TC 5C 7H"
+
+    Returns: This function gets the 5 best cards out of list of 5 or more card hands and appends it to an output list
+    It then returns the max of all the cards from that output list
+
+    """
+    five_card_best_hands = list()
+
+    for hand in list_of_hands:
+        five_card_best_hands.append(best_hand(hand.split()))
+
+    return max(five_card_best_hands, key=hand_rank)
+
+
+def best_wild_hand(hand):
+    """
+
+    Args:
+        hand:
+
+    Returns:
+
+    """
+
+    return best_hand_from_list_of_hands(hands_without_joker(hand))
+
+
+def test_best_wild_hand():
+    print "one"
+    assert (sorted(best_wild_hand("6C 7C 8C 9C TC 5C ?B".split()))
+            == ['7C', '8C', '9C', 'JC', 'TC'])
+    print "two"
+    assert (sorted(best_wild_hand("TD TC 5H 5C 7C ?R ?B".split()))
+            == ['7C', 'TC', 'TD', 'TH', 'TS'])
+    print "three"
+    assert (sorted(best_wild_hand("JD TC TH 7C 7D 7S 7H".split()))
+            == ['7C', '7D', '7H', '7S', 'JD'])
+    return 'test_best_wild_hand passes'
 
 
 def poker(hands):
@@ -116,9 +236,9 @@ def test():
 #
 # -----------------
 # Grading Notes
-# 
-# Muliple correct answers will be accepted in cases 
-# where the best hand is ambiguous (for example, if 
+#
+# Muliple correct answers will be accepted in cases
+# where the best hand is ambiguous (for example, if
 # you have 4 kings and 3 queens, there are three best
 # hands: 4 kings along with any of the three queens).
 
@@ -218,13 +338,8 @@ def test_best_hand():
     return 'test_best_hand passes'
 
 
-print test_best_hand()
-
-# ##### Side work #####
-# best_hand = max(list(best_hand("JD TC TH 7C 7D 7S 7H".split())), key=hand_rank)
-# best_hand = max(best_hand("JD TC TH 7C 7D 7S 7H".split()), key=hand_rank)
-# print best_hand
-# hand = "TD TC TH 7C 7D 8C 8S".split()
-# print sorted(best_hand(hand))
-# best_hand_sorted_by_card_rank = card_ranks(best_hand)
-# print best_hand_sorted_by_card_rank
+# print test_best_wild_hand()
+hands_without_joker("TD TC 5H 5C 7C ?R TH".split())
+hands_without_joker("TD TC 5H 5C 7C 7C ?B".split())
+hands_without_joker("TD TC 5H 5C 7C ?R ?B".split())
+hands_without_joker("TD TC 5H 5C 7C 5C 7C".split())
