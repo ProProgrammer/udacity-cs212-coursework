@@ -67,95 +67,43 @@ def hands_without_joker(hand):
 
     """
 
-    print "input hand:", hand
-
-    # hand_list_without_black_wildcard = []
-    # hand_list_without_red_wildcard = []
     hand_without_wildcard = []
     rank = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
-    # rank = ["2", "3"]
 
     b_wildcard_replacement_suit = ["C", "S"]
-    # b_wildcard_replacement_suit = ["C"]
     r_wildcard_replacement_suit = ["D", "H"]
-    # r_wildcard_replacement_suit = ["D"]
 
     replacement_cards_for_b_wildcard = ["".join(item) for item in itertools.product(rank, b_wildcard_replacement_suit)]
     replacement_cards_for_r_wildcard = ["".join(item) for item in itertools.product(rank, r_wildcard_replacement_suit)]
 
     black_wildcard = "?B"
     red_wildcard = "?R"
-    # wildcard = "?"
 
     hand_as_str = " ".join(hand)
 
     if black_wildcard in hand_as_str and red_wildcard in hand_as_str:
         for replacement_black_card in replacement_cards_for_b_wildcard:
-            hand_without_black_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
+            if replacement_black_card not in hand_as_str:
+                hand_without_black_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
             for replacement_red_card in replacement_cards_for_r_wildcard:
-                interim_hand_without_wildcard = hand_without_black_wildcard.replace(red_wildcard, replacement_red_card)
-                hand_without_wildcard.append(interim_hand_without_wildcard)
+                if replacement_red_card not in hand_without_black_wildcard:
+                    interim_hand_without_wildcard = hand_without_black_wildcard.replace(red_wildcard, replacement_red_card)
+                    hand_without_wildcard.append(interim_hand_without_wildcard)
 
     elif black_wildcard in hand_as_str:
         for replacement_black_card in replacement_cards_for_b_wildcard:
-            interim_hand_without_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
-            hand_without_wildcard.append(interim_hand_without_wildcard)
+            if replacement_black_card not in hand_as_str:
+                interim_hand_without_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
+                hand_without_wildcard.append(interim_hand_without_wildcard)
 
     elif red_wildcard in hand_as_str:
         for replacement_red_card in replacement_cards_for_r_wildcard:
-            interim_hand_without_wildcard = hand_as_str.replace(red_wildcard, replacement_red_card)
-            hand_without_wildcard.append(interim_hand_without_wildcard)
+            if replacement_red_card not in hand_as_str:
+                interim_hand_without_wildcard = hand_as_str.replace(red_wildcard, replacement_red_card)
+                hand_without_wildcard.append(interim_hand_without_wildcard)
 
     else:
         hand_without_wildcard.append(hand_as_str)
-
-    # if wildcard in " ".join(hand):
-    #     for card in hand:
-    #         if card == black_wildcard:
-    #             for black_replacement_card in replacement_cards_for_b_wildcard:
-    #                 hand_without_black_wildcard = " ".join(hand).replace(black_wildcard, black_replacement_card)
-    #                 if red_wildcard in hand_without_black_wildcard:
-    #                     hand_without_black_wildcard_as_list = hand_without_black_wildcard.split()
-    #                     for card2 in hand_without_black_wildcard_as_list:
-    #                         if card2 == red_wildcard:
-    #                             for red_replacement_card in replacement_cards_for_r_wildcard:
-    #                                 hand_without_any_wildcard = " ".join(
-    #                                     hand_without_black_wildcard_as_list).replace(red_wildcard, red_replacement_card)
-    #                                 hand_without_wildcard.append(hand_without_any_wildcard)
-    #                 else:
-    #                     hand_without_wildcard.append(hand_without_black_wildcard)
-    # else:
-    #     hand_without_wildcard.append(" ".join(hand))
-
-    # if black_wildcard in hand:
-    #     for card in hand:
-    #         if card == black_wildcard:
-    #             for x in replacement_cards_for_b_wildcard:
-    #                 hand_without_wildcard = " ".join(hand).replace(black_wildcard, x)
-    #                 hand_list_without_black_wildcard.append(hand_without_wildcard)
-    # else:
-    #     hand_list_without_black_wildcard.append(" ".join(hand))
-    #
-    # # print "hand_list_without_black_wildcard:", hand_list_without_black_wildcard
-    # for hand in hand_list_without_black_wildcard:
-    #     if red_wildcard in hand:
-    #         hand_as_list = hand.split()
-    #         # print "hand_as_list:", hand_as_list
-    #         for card in hand_as_list:
-    #             if card == red_wildcard:
-    #                 # print card
-    #                 for replacement_card in replacement_cards_for_r_wildcard:
-    #                     hand_without_wildcard = " ".join(hand_as_list).replace(red_wildcard, replacement_card)
-    #                     hand_list_without_red_wildcard.append(hand_without_wildcard)
-    #     else:
-    #         hand_list_without_red_wildcard.append(hand)
-
-    # print "hand_list_without_red_wildcard:", hand_list_without_red_wildcard
-    #
-    # if hand_list_without_black_wildcard:
-    #     return hand_list_without_black_wildcard
-    # else:
-    #     return [" ".join(hand)]
 
     return hand_without_wildcard
 
@@ -173,7 +121,9 @@ def best_hand_from_list_of_hands(list_of_hands):
     five_card_best_hands = list()
 
     for hand in list_of_hands:
-        five_card_best_hands.append(best_hand(hand.split()))
+        hand_as_list = hand.split()
+        best_hand = max(itertools.combinations(hand_as_list, 5), key=hand_rank)
+        five_card_best_hands.append(best_hand)
 
     return max(five_card_best_hands, key=hand_rank)
 
@@ -187,18 +137,14 @@ def best_wild_hand(hand):
     Returns:
 
     """
-
     return best_hand_from_list_of_hands(hands_without_joker(hand))
 
 
 def test_best_wild_hand():
-    print "one"
     assert (sorted(best_wild_hand("6C 7C 8C 9C TC 5C ?B".split()))
             == ['7C', '8C', '9C', 'JC', 'TC'])
-    print "two"
     assert (sorted(best_wild_hand("TD TC 5H 5C 7C ?R ?B".split()))
             == ['7C', 'TC', 'TD', 'TH', 'TS'])
-    print "three"
     assert (sorted(best_wild_hand("JD TC TH 7C 7D 7S 7H".split()))
             == ['7C', '7D', '7H', '7S', 'JD'])
     return 'test_best_wild_hand passes'
@@ -267,37 +213,6 @@ def test():
     return 'tests pass'
 
 
-# CS 212, hw1-1: 7-card stud
-#
-# -----------------
-# User Instructions
-#
-# Write a function best_hand(hand) that takes a seven
-# card hand as input and returns the best possible 5
-# card hand. The itertools library has some functions
-# that may help you solve this problem.
-#
-# -----------------
-# Grading Notes
-#
-# Muliple correct answers will be accepted in cases
-# where the best hand is ambiguous (for example, if
-# you have 4 kings and 3 queens, there are three best
-# hands: 4 kings along with any of the three queens).
-
-
-def best_hand(hand):
-    """
-
-    Args:
-        hand: A hand with at least 5 cards Eg: "6C 7C 8C 9C TC 5C JS".split()
-
-    Returns: From a 7-card hand, return the best 5 card hand.
-
-    """
-    return max(itertools.combinations(hand, 5), key=hand_rank)
-
-
 def card_ranks(hand):
     """
 
@@ -364,25 +279,6 @@ def two_pair(ranks):
 
     """
     pair = kind(2, ranks)
-    low_pair = kind(2, list(reversed(ranks)))
-    if pair and low_pair != pair:
-        return pair, low_pair
-    else:
-        return None
 
 
-def test_best_hand():
-    assert (sorted(best_hand("6C 7C 8C 9C TC 5C JS".split()))
-            == ['6C', '7C', '8C', '9C', 'TC'])
-    assert (sorted(best_hand("TD TC TH 7C 7D 8C 8S".split()))
-            == ['8C', '8S', 'TC', 'TD', 'TH'])
-    assert (sorted(best_hand("JD TC TH 7C 7D 7S 7H".split()))
-            == ['7C', '7D', '7H', '7S', 'JD'])
-    return 'test_best_hand passes'
-
-
-# print test_best_wild_hand()
-print hands_without_joker("TD TC 5H 5C 7C ?R TH".split())
-print hands_without_joker("TD TC 5H 5C 7C 7C ?B".split())
-print hands_without_joker("TD TC 5H 5C 7C ?R ?B".split())
-print hands_without_joker("TD TC 5H 5C 7C 5C 7C".split())
+print test_best_wild_hand()
