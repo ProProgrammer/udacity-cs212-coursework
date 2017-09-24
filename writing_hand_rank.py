@@ -85,25 +85,47 @@ def hands_without_joker(hand):
 
     black_wildcard = "?B"
     red_wildcard = "?R"
-    wildcard = "?"
+    # wildcard = "?"
 
-    if wildcard in " ".join(hand):
-        for card in hand:
-            if card == black_wildcard:
-                for black_replacement_card in replacement_cards_for_b_wildcard:
-                    hand_without_black_wildcard = " ".join(hand).replace(black_wildcard, black_replacement_card)
-                    if red_wildcard in hand_without_black_wildcard:
-                        hand_without_black_wildcard_as_list = hand_without_black_wildcard.split()
-                        for card2 in hand_without_black_wildcard_as_list:
-                            if card2 == red_wildcard:
-                                for red_replacement_card in replacement_cards_for_r_wildcard:
-                                    hand_without_any_wildcard = " ".join(
-                                        hand_without_black_wildcard_as_list).replace(red_wildcard, red_replacement_card)
-                                    hand_without_wildcard.append(hand_without_any_wildcard)
-                    else:
-                        hand_without_wildcard.append(hand_without_black_wildcard)
+    hand_as_str = " ".join(hand)
+
+    if black_wildcard in hand_as_str and red_wildcard in hand_as_str:
+        for replacement_black_card in replacement_cards_for_b_wildcard:
+            hand_without_black_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
+            for replacement_red_card in replacement_cards_for_r_wildcard:
+                interim_hand_without_wildcard = hand_without_black_wildcard.replace(red_wildcard, replacement_red_card)
+                hand_without_wildcard.append(interim_hand_without_wildcard)
+
+    elif black_wildcard in hand_as_str:
+        for replacement_black_card in replacement_cards_for_b_wildcard:
+            interim_hand_without_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
+            hand_without_wildcard.append(interim_hand_without_wildcard)
+
+    elif red_wildcard in hand_as_str:
+        for replacement_red_card in replacement_cards_for_r_wildcard:
+            interim_hand_without_wildcard = hand_as_str.replace(red_wildcard, replacement_red_card)
+            hand_without_wildcard.append(interim_hand_without_wildcard)
+
     else:
-        hand_without_wildcard.append(" ".join(hand))
+        hand_without_wildcard.append(hand_as_str)
+
+    # if wildcard in " ".join(hand):
+    #     for card in hand:
+    #         if card == black_wildcard:
+    #             for black_replacement_card in replacement_cards_for_b_wildcard:
+    #                 hand_without_black_wildcard = " ".join(hand).replace(black_wildcard, black_replacement_card)
+    #                 if red_wildcard in hand_without_black_wildcard:
+    #                     hand_without_black_wildcard_as_list = hand_without_black_wildcard.split()
+    #                     for card2 in hand_without_black_wildcard_as_list:
+    #                         if card2 == red_wildcard:
+    #                             for red_replacement_card in replacement_cards_for_r_wildcard:
+    #                                 hand_without_any_wildcard = " ".join(
+    #                                     hand_without_black_wildcard_as_list).replace(red_wildcard, red_replacement_card)
+    #                                 hand_without_wildcard.append(hand_without_any_wildcard)
+    #                 else:
+    #                     hand_without_wildcard.append(hand_without_black_wildcard)
+    # else:
+    #     hand_without_wildcard.append(" ".join(hand))
 
     # if black_wildcard in hand:
     #     for card in hand:
