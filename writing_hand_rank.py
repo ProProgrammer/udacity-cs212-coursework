@@ -55,6 +55,23 @@
 import itertools
 
 
+def _replace_wild_card(input_hand_str, wildcard, replacement_card):
+    """
+
+    Args:
+        input_hand_str: input hand in string format
+        wildcard: Wildcard to replace
+        replacement_card: Card to replace wildcard with
+
+    Returns: hand in string format with that particular wild card replaced with the particular replacement_card
+
+    """
+
+    if replacement_card not in input_hand_str:
+        return input_hand_str.replace(wildcard, replacement_card)
+    return None
+
+
 def hands_without_joker(hand):
     """
 
@@ -83,23 +100,24 @@ def hands_without_joker(hand):
 
     if black_wildcard in hand_as_str and red_wildcard in hand_as_str:
         for replacement_black_card in replacement_cards_for_b_wildcard:
-            if replacement_black_card not in hand_as_str:
-                hand_without_black_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
-            for replacement_red_card in replacement_cards_for_r_wildcard:
-                if replacement_red_card not in hand_without_black_wildcard:
-                    interim_hand_without_wildcard = hand_without_black_wildcard.replace(red_wildcard, replacement_red_card)
-                    hand_without_wildcard.append(interim_hand_without_wildcard)
+            hand_without_black_wildcard = _replace_wild_card(hand_as_str, black_wildcard, replacement_black_card)
+            if hand_without_black_wildcard:
+                for replacement_red_card in replacement_cards_for_r_wildcard:
+                    interim_hand_without_wildcard = _replace_wild_card(hand_without_black_wildcard, red_wildcard,
+                                                                       replacement_red_card)
+                    if interim_hand_without_wildcard:
+                        hand_without_wildcard.append(interim_hand_without_wildcard)
 
     elif black_wildcard in hand_as_str:
         for replacement_black_card in replacement_cards_for_b_wildcard:
-            if replacement_black_card not in hand_as_str:
-                interim_hand_without_wildcard = hand_as_str.replace(black_wildcard, replacement_black_card)
+            interim_hand_without_wildcard = _replace_wild_card(hand_as_str, black_wildcard, replacement_black_card)
+            if interim_hand_without_wildcard:
                 hand_without_wildcard.append(interim_hand_without_wildcard)
 
     elif red_wildcard in hand_as_str:
         for replacement_red_card in replacement_cards_for_r_wildcard:
-            if replacement_red_card not in hand_as_str:
-                interim_hand_without_wildcard = hand_as_str.replace(red_wildcard, replacement_red_card)
+            interim_hand_without_wildcard = _replace_wild_card(hand_as_str, red_wildcard, replacement_red_card)
+            if interim_hand_without_wildcard:
                 hand_without_wildcard.append(interim_hand_without_wildcard)
 
     else:
