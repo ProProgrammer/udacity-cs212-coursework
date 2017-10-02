@@ -4,6 +4,7 @@
 # Complete the fill_in(formula) function by adding your code to
 # the two places marked with ?????.
 
+import cProfile
 import itertools
 import re
 import string
@@ -46,3 +47,39 @@ def valid(f):
         return not re.search(r'\b0[0-9]', f) and eval(f) is True
     except ArithmeticError:
         return False
+
+
+# cProfile.run("print solve('ODD + ODD == EVEN')")
+
+# --------------
+# User Instructions
+#
+# Write a function, compile_word(word), that compiles a word
+# of UPPERCASE letters as numeric digits. For example:
+# compile_word('YOU') => '(1*U + 10*O +100*Y)'
+# Non-uppercase words should remain unchaged.
+
+def index_based_multiplier(len_of_word, position_in_list):
+    return 10 ** (len_of_word - (position_in_list + 1))
+
+
+def compile_word(word):
+    """Compile a word of uppercase letters as numeric digits.
+    E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
+    Non-uppercase words unchanged: compile_word('+') => '+'"""
+    interim_list = []
+    list_of_chars = [x for x in word]
+    len_of_word = len(word)
+    position_in_list = 0
+    for char in list_of_chars:
+        if char in string.ascii_uppercase:
+            multiplier = index_based_multiplier(len_of_word, position_in_list)
+            interim_list.insert(0, '{}*{}+'.format(multiplier, char))
+        else:
+            interim_list.append(char)
+        position_in_list += 1
+
+    return '({})'.format("".join(interim_list))
+
+
+# cProfile.run('print compile_word("DeePLs123D")')
