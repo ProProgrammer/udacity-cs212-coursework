@@ -59,27 +59,16 @@ def valid(f):
 # compile_word('YOU') => '(1*U + 10*O +100*Y)'
 # Non-uppercase words should remain unchaged.
 
-def index_based_multiplier(len_of_word, position_in_list):
-    return 10 ** (len_of_word - (position_in_list + 1))
-
 
 def compile_word(word):
     """Compile a word of uppercase letters as numeric digits.
     E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
     Non-uppercase words unchanged: compile_word('+') => '+'"""
-    interim_list = []
-    list_of_chars = [x for x in word]
-    len_of_word = len(word)
-    position_in_list = 0
-    for char in list_of_chars:
-        if char in string.ascii_uppercase:
-            multiplier = index_based_multiplier(len_of_word, position_in_list)
-            interim_list.insert(0, '{}*{}+'.format(multiplier, char))
-        else:
-            interim_list.append(char)
-        position_in_list += 1
-
-    return '({})'.format("".join(interim_list))
-
+    if word.isupper():
+        terms = [('{}*{}'.format(10 ** i, d))
+                 for (i, d) in enumerate(word[::-1])]
+        return '({})'.format('+'.join(terms))
+    else:
+        return word
 
 # cProfile.run('print compile_word("DeePLs123D")')
