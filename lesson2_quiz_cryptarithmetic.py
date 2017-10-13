@@ -4,7 +4,6 @@
 # Complete the fill_in(formula) function by adding your code to
 # the two places marked with ?????.
 
-import cProfile
 import itertools
 import re
 import string
@@ -49,15 +48,38 @@ def valid(f):
         return False
 
 
-# cProfile.run("print solve('ODD + ODD == EVEN')")
-
 # --------------
 # User Instructions
 #
-# Write a function, compile_word(word), that compiles a word
-# of UPPERCASE letters as numeric digits. For example:
-# compile_word('YOU') => '(1*U + 10*O +100*Y)'
-# Non-uppercase words should remain unchaged.
+# Modify the function compile_formula so that the function
+# it returns, f, does not allow numbers where the first digit
+# is zero. So if the formula contained YOU, f would return
+# False anytime that Y was 0
+
+
+def compile_formula(formula, verbose=False):
+    """Compile formula into a function. Also return letters found, as a str,
+    in same order as parms of function. The first digit of a multi-digit
+    number can't be 0. So if YOU is a word in the formula, and the function
+    is called with Y equal to 0, the function should return False."""
+
+    # modify the code in this function.
+
+    letters = ''.join(set(re.findall('[A-Z]', formula)))
+    parms = ', '.join(letters)
+    tokens = map(compile_word, re.split('([A-Z]+)', formula))
+
+    start_letters = []
+    for item in tokens:
+        if item.startswith('(') and item.endswith(')'):
+            start_letters.append(item.split('*')[-1][0])
+    start_letter_strings_compared_with_zero = ['{} != 0'.format(x) for x in start_letters]
+    single_string_of_start_letters_strings_compared_with_zero = 'and '.join(start_letter_strings_compared_with_zero)
+    body = '{} and {}'.format(''.join(tokens), single_string_of_start_letters_strings_compared_with_zero)
+
+    f = 'lambda {}: {}'.format(parms, body)
+    if verbose: print f
+    return eval(f), letters
 
 
 def compile_word(word):
@@ -65,10 +87,32 @@ def compile_word(word):
     E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
     Non-uppercase words unchanged: compile_word('+') => '+'"""
     if word.isupper():
-        terms = [('{}*{}'.format(10 ** i, d))
+        terms = [('%s*%s' % (10 ** i, d))
                  for (i, d) in enumerate(word[::-1])]
-        return '({})'.format('+'.join(terms))
+        return '(' + '+'.join(terms) + ')'
     else:
         return word
 
-# cProfile.run('print compile_word("DeePLs123D")')
+
+def faster_solve(formula):
+    """Given a formula like 'ODD + ODD == EVEN', fill in digits to solve it.
+    Input formula is a string; output is a digit-filled-in string or None.
+    This version precompiles the formula; only one eval per formula."""
+
+    f, letters = compile_formula(formula)
+    for digits in itertools.permutations((1, 2, 3, 4, 5, 6, 7, 8, 9, 0), len(letters)):
+        try:
+            if f(*digits) is True:
+                table = string.maketrans(letters, ''.join(map(str, digits)))
+                return formula.translate(table)
+        except ArithmeticError:
+            pass
+
+
+def test():
+    assert not faster_solve('A + B == BA')  # should NOT return '1 + 0 == 01'
+    assert faster_solve('YOU == ME**2') == ('289 == 17**2' or '576 == 24**2' or '841 == 29**2')
+    assert faster_solve('X / X == X') == '1 / 1 == 1'
+    return 'tests pass'
+
+print test()
