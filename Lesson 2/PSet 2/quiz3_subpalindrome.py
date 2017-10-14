@@ -52,49 +52,20 @@ Idea for the nested for loop to get all substrings took birth this way:
 """
 
 
-def get_all_substrings(text):
-    # start_length = len(text)
-    # all_substrings = []
-    #
-    # # Get all substrings from a string in a list called all_substrings
-    # for x in xrange(start_length):
-    #     # This length will be calculated in each iteration of for loop as we will reduce the "text" by one character
-    #     # in each iteration to get all the substrings from the input text
-    #     length = len(text)
-    #
-    #     for i in xrange(length):
-    #         sub_str = text[0:i + 1]
-    #         all_substrings.append(sub_str)
-    #
-    #     text = text[1:]
-    #
-    # return list(set(all_substrings))
+def get_all_substrings_sorted_by_length(text):
 
     length = len(text)
-    output_list = [text[i:j+1] for i in range(length) for j in range(i, length)]
-    return set(output_list)
+    return sorted([text[i:j+1] for i in range(length) for j in range(i, length)], key=len, reverse=True)
 
 
-def _list_of_substrings_with_their_lengths_sorted(all_substrings):
-    return sorted(zip(all_substrings, map(len, all_substrings)), key=lambda inp: inp[1], reverse=True)
+def get_palindrome_strings(list_of_substrings):
+    return (x for x in list_of_substrings if x == x[::-1])
 
 
-def _get_start_end_pos_of_first_palindrome_in_list_of_mapping_of_substring_with_its_length(input_list, full_text):
-    """
-
-    Args:
-        input_list: list of tuples containing substrings and its length
-        full_text: The full text in which we need to find the start and end position of the substring if its a
-        palindrome
-
-    Returns: start position of palindrome (pos_of_palindrome), end position of palindrome + 1 (length +
-    pos_of_palindrome)
-
-    """
-    for string, length in input_list:
-        if string == string[::-1]:
-            pos_of_palindrome = full_text.find(string)
-            return pos_of_palindrome, length + pos_of_palindrome
+def get_start_pos_end_pos_of_a_sub_string(substring, fullstring):
+    start_pos = fullstring.find(substring)
+    end_pos = start_pos + len(substring)
+    return start_pos, end_pos
 
 
 def longest_subpalindrome_slice(text):
@@ -108,11 +79,9 @@ def longest_subpalindrome_slice(text):
 
     """
     Approach taken:
-    # Get all substrings from a string
-    # Create a list of tuples of all substrings with their respective lengths
-    # Sort the list using length as key in reverse order (longest substring first)
-    # Iterate over all substrings & check if it is a palindrome
-    ## Return the position of substring in input text along with "its length + position in input text"
+    # Get all substrings from a string sorted by length
+    # Yield on first palindrome from list of already sorted substrings
+    # Return the start and end position of first palindrome in the sorted list
     """
 
     # Since we are case agnostic
@@ -122,19 +91,9 @@ def longest_subpalindrome_slice(text):
     if text == text[::-1]:
         return 0, len(text)
 
-    # Backup input text into a second variable original_text as we are going to manipulate text variable inside a for
-    #  loop below
-    original_text = text
-
-    all_substrings = get_all_substrings(text)
-
-    # Create a list of tuples of all substrings with their respective lengths sorted using length as key in reverse
-    # order (longest substring first)
-    substrings_sorted_by_length = _list_of_substrings_with_their_lengths_sorted(all_substrings)
-
-    # Return the position of substring in input text along with "its length + position in input text"
-    return _get_start_end_pos_of_first_palindrome_in_list_of_mapping_of_substring_with_its_length(
-        substrings_sorted_by_length, original_text)
+    all_substrings_reverse_sorted = get_all_substrings_sorted_by_length(text)
+    palindrome = get_palindrome_strings(all_substrings_reverse_sorted).next()
+    return get_start_pos_end_pos_of_a_sub_string(palindrome, text)
 
 
 def test():
@@ -154,18 +113,13 @@ print test()
 
 if __name__ == '__main__':
     import timeit
-    setup_string = """from __main__ import _list_of_substrings_with_their_lengths_sorted, get_all_substrings, _get_start_end_pos_of_first_palindrome_in_list_of_mapping_of_substring_with_its_length; all_substrings=get_all_substrings('something rac e car going'); substrings_sorted_by_length = _list_of_substrings_with_their_lengths_sorted(all_substrings);"""
-
     print timeit.timeit("test()", setup="from __main__ import test", number=10000)
     print timeit.timeit("longest_subpalindrome_slice('something rac e car going')",
                         setup="from __main__ import longest_subpalindrome_slice", number=10000)
-    print timeit.timeit("get_all_substrings('something rac e car going')",
-                        setup="from __main__ import get_all_substrings", number=10000)
-    print timeit.timeit("_list_of_substrings_with_their_lengths_sorted(all_substrings)",
-                        setup="from __main__ import _list_of_substrings_with_their_lengths_sorted, "
-                              "get_all_substrings; all_substrings=get_all_substrings('something rac e car going')",
+    print timeit.timeit("get_all_substrings_sorted_by_length('something rac e car going')",
+                        setup="from __main__ import get_all_substrings_sorted_by_length", number=10000)
+    print timeit.timeit("get_palindrome_strings(all_substrings)",
+                        setup="from __main__ import get_palindrome_strings, get_all_substrings_sorted_by_length; "
+                              "all_substrings=get_all_substrings_sorted_by_length('something rac e car going')",
                         number=10000)
-    print timeit.timeit("_get_start_end_pos_of_first_palindrome_in_list_of_mapping_of_substring_with_its_length("
-                        "substrings_sorted_by_length, 'something rac e car going')", setup=setup_string, number=10000)
-
-
+    # longest_subpalindrome_slice('something rac e car going')
