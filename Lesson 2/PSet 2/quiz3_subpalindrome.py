@@ -52,10 +52,16 @@ Idea for the nested for loop to get all substrings took birth this way:
 """
 
 
-def get_all_substrings_sorted_by_length(text):
+def is_palindrome(input_str):
+    return input_str == input_str[::-1]
 
+
+def get_all_substrings_sorted_by_length(text):
     length = len(text)
-    return sorted([text[i:j+1] for i in range(length) for j in range(i, length)], key=len, reverse=True)
+    output_list = [text[i:j + 1] for i in range(length) for j in range(i, length)]
+    output_list.sort(key=len, reverse=True)
+
+    return output_list
 
 
 def get_palindrome_strings(list_of_substrings):
@@ -118,8 +124,8 @@ if __name__ == '__main__':
                         setup="from __main__ import longest_subpalindrome_slice", number=10000)
     print timeit.timeit("get_all_substrings_sorted_by_length('something rac e car going')",
                         setup="from __main__ import get_all_substrings_sorted_by_length", number=10000)
-    print timeit.timeit("get_palindrome_strings(all_substrings)",
-                        setup="from __main__ import get_palindrome_strings, get_all_substrings_sorted_by_length; "
-                              "all_substrings=get_all_substrings_sorted_by_length('something rac e car going')",
-                        number=10000)
+    # print timeit.timeit("get_palindrome_strings(all_substrings)",
+    #                     setup="from __main__ import get_palindrome_strings, get_all_substrings_sorted_by_length; "
+    #                           "all_substrings=get_all_substrings_sorted_by_length('something rac e car going')",
+    #                     number=10000)
     # longest_subpalindrome_slice('something rac e car going')
